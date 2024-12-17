@@ -16,16 +16,23 @@ def calcular_economia(custo_anual_com_oculos, custo_cirurgia, taxa_inflacao, ano
         list: Lista com os custos anuais ajustados pela inflação.
         float: Economia total.
     """
-# Cálculo correto da economia total
-    custo_total_oculos = sum(custos_anuais)
-    economia_total = custo_total_oculos - custo_cirurgia
-    return custos_anuais, economia_total
+custos_anuais = []
+    for ano in range(1, anos_futuro + 1):
+        custo_anual_ajustado = custo_anual_com_oculos * (1 + taxa_inflacao)**ano
+        custos_anuais.append(custo_anual_ajustado)
+
+    return custos_anuais
 
 # Coleta de dados
 custo_anual_com_oculos = float(st.number_input("Qual o custo médio anual com óculos?"))
 custo_cirurgia = float(st.number_input("Qual o custo da cirurgia?"))
 taxa_inflacao = st.number_input('Taxa de inflação anual esperada (%):', min_value=0.0, max_value=100.0) / 100
 anos_futuro = st.number_input("Em quantos anos você gostaria de estimar a economia?", min_value=1)
+
+# Cálculos fora da função
+custos_anuais = calcular_economia(custo_anual_com_oculos, custo_cirurgia, taxa_inflacao, anos_futuro)
+custo_total_oculos = sum(custos_anuais)
+economia_total = custo_total_oculos - custo_cirurgia
 
 # Cálculos e visualização
 custos_anuais, economia_total = calcular_economia(custo_anual_com_oculos, custo_cirurgia, taxa_inflacao, anos_futuro)
