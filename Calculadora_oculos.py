@@ -40,14 +40,17 @@ st.write(f"Economia total nos próximos {anos_futuro} anos: R$ {economia_total:.
 df = pd.DataFrame({'Ano': range(1, anos_futuro + 1), 'Custo Anual': custos_anuais})
 st.table(df)
 
-# Cria um gráfico
-plt.plot(range(1, anos_futuro + 1), custos_anuais, label="Custo anual com óculos")
-plt.axhline(y=custo_cirurgia, color='r', linestyle='--', label="Custo da cirurgia")
-plt.xlabel("Anos")
-plt.ylabel("Custo (R$)")
-plt.title("Economia ao longo dos anos")
-plt.legend()
+# Criar a figura e o eixo
+fig, ax = plt.subplots()
 
-# Exibe o gráfico no Streamlit
-st.pyplot()
+# Plotar o gráfico
+ax.plot(range(1, anos_futuro + 1), custos_anuais, label="Custo anual com óculos")
+ax.axhline(y=custo_cirurgia, color='r', linestyle='--', label="Custo da cirurgia")
+ax.set_xlabel("Anos")
+ax.set_ylabel("Custo (R$)")
+ax.set_title("Economia ao longo dos anos")
+ax.legend()
+
+# Exibir o gráfico no Streamlit
+st.pyplot(fig)
 
