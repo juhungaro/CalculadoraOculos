@@ -47,4 +47,7 @@ plt.xlabel("Anos")
 plt.ylabel("Custo (R$)")
 plt.title("Economia ao longo dos anos")
 plt.legend()
-plt.show()
+
+# Exibe o gráfico no Streamlit
+st.pyplot()
+
