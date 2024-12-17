@@ -2,68 +2,66 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def calcular_economia(custo_anual_com_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, taxa_inflacao, anos_futuro):
+def calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, taxa_inflacao, anos_futuro):
     custos_anuais = []
+    custos_acumulados = []
+    custo_acumulado = 0
     for ano in range(1, anos_futuro + 1):
-        custo_anual_total = custo_anual_com_oculos + custo_caixa_lentes * caixas_por_ano + custo_frasco_solucao * frascos_por_ano
+        custo_anual_total = custo_anual_oculos + (custo_caixa_lentes * caixas_por_ano) + (custo_frasco_solucao * frascos_por_ano)
         custo_anual_ajustado = custo_anual_total * (1 + taxa_inflacao)**ano
         custos_anuais.append(custo_anual_ajustado)
-    return custos_anuais
+        custo_acumulado += custo_anual_ajustado
+        custos_acumulados.append(custo_acumulado)
+    return custos_anuais, custos_acumulados
 
-  Args:
-        custo_anual_com_oculos (float): Custo anual com óculos.
-        custo_caixa_lentes (float): Custo de uma caixa de lentes de contato.
-        caixas_por_ano (float): Número de caixas de lentes por ano.
-        custo_frasco_solucao (float): Custo de um frasco de solução.
-        frascos_por_ano (float): Número de frascos por ano.
-        custo_cirurgia (float): Custo da cirurgia.
-        anos_futuro (int): Número de anos para o cálculo.
+def formatar_moeda(valor):
+    return f"R$ {valor:,.2f}"
 
-    Returns:
-        list: Lista com os custos anuais ajustados pela inflação.
+st.title("Calculadora de Custos de Cirurgia Refrativa")
 
-  
-# Coleta de dados do usuário
-idade = st.number_input("Quantos anos você tem?")
-custo_anual_com_oculos = float(st.number_input("Quanto você paga pelos seus óculos de grau por ano?"))
-custo_caixa_lentes = float(st.number_input("Quanto você paga por uma caixa de lentes de contato?"))
-caixas_por_ano = float(st.number_input("Quantas caixas de lentes de contato você usa por ano?"))
-custo_frasco_solucao = float(st.number_input("Quanto você paga por um frasco de solução para lentes de contato?"))
-frascos_por_ano = float(st.number_input("Quantos frascos de solução para lentes de contato você usa por ano?"))
-custo_cirurgia = float(st.number_input("Qual o custo da cirurgia?"))
-taxa_inflacao = st.number_input('Taxa de inflação anual esperada (%):', min_value=0.0, max_value=100.0) / 100
-anos_futuro = 77.2 - idade  # Considerando expectativa de vida de 77.2 anos
+col1, col2 = st.columns(2)
 
+with col1:
+    idade = st.number_input("Idade", min_value=0, max_value=120, step=1)
+    custo_anual_oculos = st.number_input("Custo anual com óculos", min_value=0.0, step=0.01)
+    custo_caixa_lentes = st.number_input("Custo de uma caixa de lentes de contato", min_value=0.0, step=0.01)
+    caixas_por_ano = st.number_input("Número de caixas de lentes por ano", min_value=0.0, step=0.1)
 
-# Cálculos
-custos_anuais = calcular_economia(custo_anual_com_oculos, custo_cirurgia, taxa_inflacao, anos_futuro)
-custo_total_oculos = sum(custos_anuais)
-economia_total = custo_total_oculos - custo_cirurgia
+with col2:
+    custo_frasco_solucao = st.number_input("Custo de um frasco de solução para lentes", min_value=0.0, step=0.01)
+    frascos_por_ano = st.number_input("Número de frascos de solução por ano", min_value=0.0, step=0.1)
+    custo_cirurgia = st.number_input("Custo da cirurgia refrativa", min_value=0.0, step=0.01)
+    taxa_inflacao = st.number_input('Taxa de inflação anual esperada (%)', min_value=0.0, max_value=100.0, step=0.1) / 100
 
-# Cálculo do custo total ao longo da vida com óculos e lentes de contato
-custo_total_vida = custo_total_oculos + (custo_caixa_lentes * caixas_por_ano + custo_frasco_solucao * frascos_por_ano) * anos_futuro
+anos_futuro = int(77.2 - idade)  # Considerando expectativa de vida de 77.2 anos
 
-# Cálculo da economia ao longo da vida
-economia_vida = custo_total_vida - custo_cirurgia
+if st.button("Calcular"):
+    custos_anuais, custos_acumulados = calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, taxa_inflacao, anos_futuro)
+    
+    economia_vida = custos_acumulados[-1] - custo_cirurgia
+    economia_anual_media = economia_vida / anos_futuro
+    
+    # Cálculo do ponto de equilíbrio
+    ponto_equilibrio = next((i for i, valor in enumerate(custos_acumulados) if valor > custo_cirurgia), None)
+    
+    st.subheader("Resultados")
+    st.write(f"Economia total ao longo da vida: {formatar_moeda(economia_vida)}")
+    st.write(f"Economia anual média: {formatar_moeda(economia_anual_media)}")
+    if ponto_equilibrio:
+        st.write(f"A cirurgia se paga em {ponto_equilibrio} anos")
+    else:
+        st.write("A cirurgia não se paga no período analisado")
 
-# Cálculo da economia anual média
-economia_anual_media = economia_vida / anos_futuro
+    # Gráfico
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(range(1, anos_futuro + 1), custos_acumulados, label="Custos acumulados sem cirurgia")
+    ax.axhline(y=custo_cirurgia, color='r', linestyle='--', label="Custo da cirurgia")
+    ax.set_xlabel("Anos")
+    ax.set_ylabel("Custo (R$)")
+    ax.set_title("Comparação de custos ao longo dos anos")
+    ax.legend()
+    ax.grid(True)
 
-# Exibe os resultados
-st.write(f"Economia total ao longo da vida: R$ {economia_vida:.2f}")
-st.write(f"Economia anual média: R$ {economia_anual_media:.2f}")
+    st.pyplot(fig)
 
-# Cria a figura e o eixo
-fig, ax = plt.subplots()
-
-# Plotar o gráfico
-ax.plot(range(1, anos_futuro + 1), custos_anuais, label="Custo anual com óculos")
-ax.axhline(y=custo_cirurgia, color='r', linestyle='--', label="Custo da cirurgia")
-ax.set_xlabel("Anos")
-ax.set_ylabel("Custo (R$)")
-ax.set_title("Economia ao longo dos anos")
-ax.legend()
-
-# Exibir o gráfico no Streamlit
-st.pyplot(fig)
-
+st.info("Esta calculadora fornece uma estimativa. Consulte um oftalmologista para informações específicas sobre sua situação.")
