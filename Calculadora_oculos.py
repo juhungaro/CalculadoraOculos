@@ -2,15 +2,14 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, taxa_inflacao, anos_futuro):
+def calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, anos_futuro):
     custos_anuais = []
     custos_acumulados = []
     custo_acumulado = 0
+    custo_anual_total = custo_anual_oculos + (custo_caixa_lentes * caixas_por_ano) + (custo_frasco_solucao * frascos_por_ano)
     for ano in range(1, anos_futuro + 1):
-        custo_anual_total = custo_anual_oculos + (custo_caixa_lentes * caixas_por_ano) + (custo_frasco_solucao * frascos_por_ano)
-        custo_anual_ajustado = custo_anual_total * (1 + taxa_inflacao)**ano
-        custos_anuais.append(custo_anual_ajustado)
-        custo_acumulado += custo_anual_ajustado
+        custos_anuais.append(custo_anual_total)
+        custo_acumulado += custo_anual_total
         custos_acumulados.append(custo_acumulado)
     return custos_anuais, custos_acumulados
 
@@ -31,12 +30,11 @@ with col2:
     custo_frasco_solucao = st.number_input("Custo de um frasco de solução para lentes", min_value=0.0, step=0.01)
     frascos_por_ano = st.number_input("Número de frascos de solução por ano", min_value=0.0, step=0.1)
     custo_cirurgia = st.number_input("Custo da cirurgia refrativa", min_value=0.0, step=0.01)
-    taxa_inflacao = st.number_input('Taxa de inflação anual esperada (%)', min_value=0.0, max_value=100.0, step=0.1) / 100
 
 anos_futuro = int(77.2 - idade)  # Considerando expectativa de vida de 77.2 anos
 
 if st.button("Calcular"):
-    custos_anuais, custos_acumulados = calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, taxa_inflacao, anos_futuro)
+    custos_anuais, custos_acumulados = calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, anos_futuro)
     
     economia_vida = custos_acumulados[-1] - custo_cirurgia
     economia_anual_media = economia_vida / anos_futuro
@@ -64,4 +62,5 @@ if st.button("Calcular"):
 
     st.pyplot(fig)
 
-st.info("Esta calculadora fornece uma estimativa. Consulte um oftalmologista para informações específicas sobre sua situação.")
+st.info("Esta calculadora fornece uma estimativa. Consulte um oftalmologista para informações específicas sobre sua situação."
+        "O calculo da expectativa de vida é de 77,2 anos em SP")
