@@ -5,7 +5,7 @@ from PIL import Image
 
 # Carregar e exibir o logo
 def mostrar_logo():
-    logo = Image.open("logo_clinica.png")
+    logo = Image.open("logo_clinica.jpg")
     st.image(logo, width=300)  
 
 def calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, custo_frasco_solucao, frascos_por_ano, custo_cirurgia, anos_futuro):
