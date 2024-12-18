@@ -22,6 +22,9 @@ def calcular_economia(custo_anual_oculos, custo_caixa_lentes, caixas_por_ano, cu
 def formatar_moeda(valor):
     return f"R$ {valor:,.2f}"
 
+# Exibir o logo
+mostrar_logo()
+
 st.title("Calculadora de Custos de Cirurgia Refrativa")
 
 col1, col2 = st.columns(2)
