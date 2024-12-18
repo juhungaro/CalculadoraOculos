@@ -68,3 +68,7 @@ Este projeto está licenciado sob a MIT License.
 
 Esta calculadora é apenas para fins informativos. Sempre consulte um oftalmologista para obter informações específicas sobre sua situação e as opções de tratamento disponíveis.
 
+**Link da Aplicação**
+
+https://calculadoraoculos.streamlit.app/
+
